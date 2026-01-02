@@ -30,19 +30,14 @@ namespace Cysharp.Threading.Tasks
 
         private static UniTask<T[]> WhenAll<T>(UniTask<T>[] tasks, int size)
         {
-            if (size > tasks.Length)
+            if (size > tasks.Length || size < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(size), "size is greater than tasks length.");
+                Error.ArgumentOutOfRange(nameof(size));
             }
 
             if (size == 0 || tasks.Length == 0)
             {
                 return UniTask.FromResult(Array.Empty<T>());
-            }
-
-            if (size < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(size), "size is negative.");
             }
 
             return new UniTask<T[]>(new WhenAllPromise<T>(tasks, size), 0);
@@ -69,19 +64,14 @@ namespace Cysharp.Threading.Tasks
 
         private static UniTask WhenAll(UniTask[] tasks, int size)
         {
-            if (size > tasks.Length)
+            if (size > tasks.Length || size < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(size), "size is greater than tasks length.");
+                Error.ArgumentOutOfRange(nameof(size));
             }
 
             if (size == 0 || tasks.Length == 0)
             {
                 return UniTask.CompletedTask;
-            }
-
-            if (size < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(size), "size is negative.");
             }
 
             return new UniTask(new WhenAllPromise(tasks, size), 0);
