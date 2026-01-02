@@ -28,6 +28,26 @@ namespace Cysharp.Threading.Tasks
             }
         }
 
+        private static UniTask<T[]> WhenAll<T>(UniTask<T>[] tasks, int size)
+        {
+            if (size > tasks.Length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(size), "size is greater than tasks length.");
+            }
+
+            if (size == 0 || tasks.Length == 0)
+            {
+                return UniTask.FromResult(Array.Empty<T>());
+            }
+
+            if (size < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(size), "size is negative.");
+            }
+
+            return new UniTask<T[]>(new WhenAllPromise<T>(tasks, size), 0);
+        }
+
         public static UniTask WhenAll(params UniTask[] tasks)
         {
             if (tasks.Length == 0)
@@ -45,6 +65,26 @@ namespace Cysharp.Threading.Tasks
                 var promise = new WhenAllPromise(span.Array, span.Length); // consumed array in constructor.
                 return new UniTask(promise, 0);
             }
+        }
+
+        private static UniTask WhenAll(UniTask[] tasks, int size)
+        {
+            if (size > tasks.Length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(size), "size is greater than tasks length.");
+            }
+
+            if (size == 0 || tasks.Length == 0)
+            {
+                return UniTask.CompletedTask;
+            }
+
+            if (size < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(size), "size is negative.");
+            }
+
+            return new UniTask(new WhenAllPromise(tasks, size), 0);
         }
 
         sealed class WhenAllPromise<T> : IUniTaskSource<T[]>
